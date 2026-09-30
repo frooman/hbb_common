@@ -73,7 +73,16 @@ lazy_static::lazy_static! {
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
     static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
-    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = {
+        // SCTG: build-time defaults — server/relay/api/key for out-of-box setup.
+        // Applied only when neither the user config nor server options define a value.
+        let mut m = HashMap::new();
+        m.insert("custom-rendezvous-server".to_owned(), "94.230.35.226".to_owned());
+        m.insert("relay-server".to_owned(), "94.230.35.226".to_owned());
+        m.insert("api-server".to_owned(), "http://94.230.35.226:21114".to_owned());
+        m.insert("key".to_owned(), "QcdCwFfmtKMhMkXQ7t5nRBnjJWLbLm0elFG+SLtVBrU=".to_owned());
+        RwLock::new(m)
+    };
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
@@ -2748,10 +2757,12 @@ fn get_or(
     c: &RwLock<HashMap<String, String>>,
     k: &str,
 ) -> Option<String> {
+    // SCTG: skip empty values in user options so build-time defaults (c) survive
+    // sync-injected empty option values; empty overwrite values still take priority.
     a.read()
         .unwrap()
         .get(k)
-        .or(b.get(k))
+        .or_else(|| b.get(k).filter(|v| !v.is_empty()))
         .or(c.read().unwrap().get(k))
         .cloned()
 }
