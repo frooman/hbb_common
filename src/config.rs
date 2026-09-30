@@ -91,8 +91,11 @@ lazy_static::lazy_static! {
     pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {
         // SCTG: lock client settings for end users (custom-client style hard option).
         // Settings UI is hidden, CLI changes are blocked; no unlock is possible.
+        // SCTG: incoming-only client — cannot initiate outgoing connections
+        // (custom-client conn-type=incoming; Rust gate in src/client.rs).
         let mut m = HashMap::new();
         m.insert("disable-settings".to_owned(), "Y".to_owned());
+        m.insert("conn-type".to_owned(), "incoming".to_owned());
         RwLock::new(m)
     };
     pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
