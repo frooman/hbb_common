@@ -81,12 +81,18 @@ lazy_static::lazy_static! {
         m.insert("relay-server".to_owned(), "94.230.35.226".to_owned());
         m.insert("api-server".to_owned(), "http://94.230.35.226:21114".to_owned());
         m.insert("key".to_owned(), "QcdCwFfmtKMhMkXQ7t5nRBnjJWLbLm0elFG+SLtVBrU=".to_owned());
+        m.insert("allow-auto-record-incoming".to_owned(), "Y".to_owned());
         RwLock::new(m)
     };
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = {
+        // SCTG: auto-record outgoing sessions enabled by default (locked/full clients).
+        let mut m = HashMap::new();
+        m.insert("allow-auto-record-outgoing".to_owned(), "Y".to_owned());
+        RwLock::new(m)
+    };
     pub static ref OVERWRITE_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {
         // SCTG: preset permanent password (hashed storage, H1 = SHA256(password + salt)).
