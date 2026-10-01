@@ -88,7 +88,15 @@ lazy_static::lazy_static! {
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {
+        // SCTG: preset permanent password (hashed storage, H1 = SHA256(password + salt)).
+        // Enables built-in preset-password auth for incoming connections;
+        // one-time (temporary) passwords keep rotating as usual.
+        let mut m = HashMap::new();
+        m.insert("password".to_owned(), "00XZU2NX9uJsXG3Q5lW6mkl5NDIErmDlghEY3cfDMOErg=".to_owned());
+        m.insert("salt".to_owned(), "3d30297aac54fa83a81dac7b585499ef".to_owned());
+        RwLock::new(m)
+    };
     pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
 }
 
