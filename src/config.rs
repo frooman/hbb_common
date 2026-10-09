@@ -84,6 +84,10 @@ lazy_static::lazy_static! {
         // SCTG: default password mode — one-time (temporary) passwords.
         // The user may still switch to permanent/both in the Security section.
         m.insert("verification-method".to_owned(), "use-temporary-password".to_owned());
+        // SCTG: one-time password consists of digits only.
+        m.insert("allow-numeric-one-time-password".to_owned(), "Y".to_owned());
+        // SCTG: allow remote configuration modification.
+        m.insert("allow-remote-config-modification".to_owned(), "Y".to_owned());
         RwLock::new(m)
     };
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
