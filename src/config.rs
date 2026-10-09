@@ -81,6 +81,9 @@ lazy_static::lazy_static! {
         m.insert("relay-server".to_owned(), "94.230.35.226".to_owned());
         m.insert("api-server".to_owned(), "http://94.230.35.226:21114".to_owned());
         m.insert("key".to_owned(), "QcdCwFfmtKMhMkXQ7t5nRBnjJWLbLm0elFG+SLtVBrU=".to_owned());
+        // SCTG: default password mode — one-time (temporary) passwords.
+        // The user may still switch to permanent/both in the Security section.
+        m.insert("verification-method".to_owned(), "use-temporary-password".to_owned());
         RwLock::new(m)
     };
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
@@ -93,13 +96,10 @@ lazy_static::lazy_static! {
         // no disable-settings (settings are reachable; the app shows only the
         // Security section and it is unlocked), cannot initiate outgoing
         // connections (custom-client conn-type=incoming; Rust gate in src/client.rs).
+        // No preset permanent password any more: the default password mode is
+        // one-time (temporary); see DEFAULT_SETTINGS -> verification-method.
         let mut m = HashMap::new();
         m.insert("conn-type".to_owned(), "incoming".to_owned());
-        // SCTG: preset permanent password (hashed storage, H1 = SHA256(password + salt)).
-        // Enables built-in preset-password auth for incoming connections;
-        // one-time (temporary) passwords keep rotating as usual.
-        m.insert("password".to_owned(), "00XZU2NX9uJsXG3Q5lW6mkl5NDIErmDlghEY3cfDMOErg=".to_owned());
-        m.insert("salt".to_owned(), "3d30297aac54fa83a81dac7b585499ef".to_owned());
         RwLock::new(m)
     };
     pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
